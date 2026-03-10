@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Eye, EyeOff, Lock, Mail, ArrowRight, User, Target, Phone, ChevronLeft } from "lucide-react";
+import React, { useState } from "react";
+import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
-    const [isSignUp, setIsSignUp] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -17,88 +16,46 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate login
+        
+        // Simple validation
+        if (!formData.email || !formData.password) {
+            alert("Please fill in all fields");
+            setLoading(false);
+            return;
+        }
+
+        // Simulate login process
         setTimeout(() => {
             router.push('/dashboard');
         }, 1000);
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%)',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            padding: '16px'
-        }}>
+        <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-yellow-50 font-sans p-4">
             {/* Bear Placeholder */}
-            <div style={{
-                width: '100%',
-                maxWidth: '400px',
-                height: '200px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px'
-            }}>
-                <div style={{
-                    width: '120px',
-                    height: '120px',
-                    background: '#fb923c',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '48px'
-                }}>
+            <div className="w-full max-w-md h-48 flex items-center justify-center mb-6">
+                <div className="w-24 h-24 bg-orange-400 rounded-full flex items-center justify-center text-4xl shadow-lg">
                     🐻
                 </div>
             </div>
 
             {/* Card Container */}
-            <div style={{
-                background: 'white',
-                width: '100%',
-                maxWidth: '400px',
-                borderRadius: '24px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                border: '1px solid #fed7aa',
-                padding: '32px'
-            }}>
+            <div className="bg-white w-full max-w-md rounded-3xl shadow-xl border border-orange-100 p-8">
                 {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                    <h1 style={{
-                        fontSize: '28px',
-                        fontWeight: 'bold',
-                        color: '#1f2937',
-                        margin: '0 0 8px 0'
-                    }}>
-                        {isSignUp ? "Join the Squad" : "Welcome Back"}
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                        Welcome Back
                     </h1>
-                    <p style={{
-                        color: '#6b7280',
-                        fontSize: '14px',
-                        margin: 0
-                    }}>
-                        {isSignUp ? "Create your character" : "Resume your progress"}
+                    <p className="text-gray-500 text-sm">
+                        Resume your progress
                     </p>
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <form onSubmit={handleLogin} className="space-y-4">
                     {/* Email Input */}
-                    <div style={{ position: 'relative' }}>
-                        <div style={{
-                            position: 'absolute',
-                            left: '16px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            color: '#9ca3af'
-                        }}>
+                    <div className="relative">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                             <Mail size={20} />
                         </div>
                         <input
@@ -107,35 +64,13 @@ export default function LoginPage() {
                             required
                             value={formData.email}
                             onChange={e => setFormData({ ...formData, email: e.target.value })}
-                            style={{
-                                width: '100%',
-                                paddingLeft: '48px',
-                                paddingRight: '16px',
-                                paddingTop: '16px',
-                                paddingBottom: '16px',
-                                background: '#f9fafb',
-                                border: '2px solid transparent',
-                                borderRadius: '16px',
-                                outline: 'none',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                color: '#1f2937',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = '#fb923c'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-orange-400 focus:bg-white rounded-2xl outline-none transition-all text-gray-800 font-semibold placeholder:text-gray-400"
                         />
                     </div>
 
                     {/* Password Input */}
-                    <div style={{ position: 'relative' }}>
-                        <div style={{
-                            position: 'absolute',
-                            left: '16px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            color: '#9ca3af'
-                        }}>
+                    <div className="relative">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                             <Lock size={20} />
                         </div>
                         <input
@@ -144,37 +79,12 @@ export default function LoginPage() {
                             required
                             value={formData.password}
                             onChange={e => setFormData({ ...formData, password: e.target.value })}
-                            style={{
-                                width: '100%',
-                                paddingLeft: '48px',
-                                paddingRight: '48px',
-                                paddingTop: '16px',
-                                paddingBottom: '16px',
-                                background: '#f9fafb',
-                                border: '2px solid transparent',
-                                borderRadius: '16px',
-                                outline: 'none',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                color: '#1f2937',
-                                boxSizing: 'border-box'
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = '#fb923c'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
+                            className="w-full pl-12 pr-12 py-4 bg-gray-50 border-2 border-transparent focus:border-orange-400 focus:bg-white rounded-2xl outline-none transition-all text-gray-800 font-semibold placeholder:text-gray-400"
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            style={{
-                                position: 'absolute',
-                                right: '16px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                background: 'none',
-                                border: 'none',
-                                color: '#9ca3af',
-                                cursor: 'pointer'
-                            }}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
@@ -184,26 +94,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        style={{
-                            width: '100%',
-                            background: '#ea580c',
-                            color: 'white',
-                            fontWeight: 'bold',
-                            padding: '16px',
-                            borderRadius: '16px',
-                            border: 'none',
-                            fontSize: '18px',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            opacity: loading ? 0.7 : 1,
-                            transform: loading ? 'none' : 'scale(1)',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseOver={(e) => !loading && (e.target.style.background = '#dc2626')}
-                        onMouseOut={(e) => !loading && (e.target.style.background = '#ea580c')}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? "Processing..." : "Login"}
                         {!loading && <ArrowRight size={22} />}
@@ -211,20 +102,10 @@ export default function LoginPage() {
                 </form>
 
                 {/* Footer */}
-                <div style={{ textAlign: 'center', marginTop: '32px' }}>
-                    <p style={{ color: '#9ca3af', fontSize: '14px', margin: 0 }}>
+                <div className="text-center mt-8">
+                    <p className="text-gray-400 text-sm">
                         Don't have an account?{' '}
-                        <button
-                            onClick={() => setIsSignUp(!isSignUp)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#ea580c',
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                textDecoration: 'underline'
-                            }}
-                        >
+                        <button className="font-bold text-orange-500 hover:text-orange-600 hover:underline transition-colors">
                             Sign Up
                         </button>
                     </p>
