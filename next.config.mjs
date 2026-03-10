@@ -1,12 +1,22 @@
-import withBundleAnalyzer from '@next/bundle-analyzer';
-
-const bundleAnalyzer = withBundleAnalyzer({
-    enabled: process.env.ANALYZE === 'true',
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Other config here
+    experimental: {
+        esmExternals: 'loose'
+    },
+    webpack: (config) => {
+        config.externals.push({
+            'utf-8-validate': 'commonjs utf-8-validate',
+            'bufferutil': 'commonjs bufferutil',
+        });
+        return config;
+    },
+    transpilePackages: ['three', '@react-three/fiber', '@react-three/drei'],
+    images: {
+        domains: ['localhost'],
+    },
+    env: {
+        CUSTOM_KEY: process.env.CUSTOM_KEY,
+    }
 };
 
-export default bundleAnalyzer(nextConfig);
+export default nextConfig;
