@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Text, Html, Stars, Stage } from "@react-three/drei";
-import ReactFlow, { Background, Controls } from "reactflow";
+import { OrbitControls, Html, Stars } from "@react-three/drei";
+import ReactFlow, { Background } from "reactflow";
 import 'reactflow/dist/style.css';
 import { Play, Pause, Maximize2 } from "lucide-react";
 
@@ -11,7 +11,7 @@ import { Play, Pause, Maximize2 } from "lucide-react";
 const AutoTourScene = ({ data, isPlaying }: any) => {
     // Auto-rotate the whole group to simulate a "Video" feel
     const groupRef = React.useRef<any>(null);
-    useFrame((state, delta) => {
+    useFrame((_state, delta) => {
         if (isPlaying && groupRef.current) {
             groupRef.current.rotation.y += delta * 0.3; // Slow rotation
         }
@@ -45,6 +45,49 @@ const AutoTourScene = ({ data, isPlaying }: any) => {
 
 export default function InlineLesson({ data }: { data: any }) {
     const [isPlaying, setIsPlaying] = useState(true);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [imageError, setImageError] = useState(false);
+
+    // Generate image when IMAGE strategy is selected
+    useEffect(() => {
+        if (data?.strategy === 'IMAGE' && data?.data?.prompt && !imageUrl && !isGenerating) {
+            generateImage();
+        }
+    }, [data]);
+
+    const generateImage = async () => {
+        setIsGenerating(true);
+        setImageError(false);
+        
+        try {
+            const response = await fetch('/api/visualize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prompt: data.data.prompt,
+                    mode: '2d'
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.type === 'svg' && result.code) {
+                    // Convert SVG to data URL
+                    const svgBlob = new Blob([result.code], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(svgBlob);
+                    setImageUrl(url);
+                }
+            } else {
+                setImageError(true);
+            }
+        } catch (error) {
+            console.error('Image generation error:', error);
+            setImageError(true);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     if (!data) return null;
 
@@ -92,6 +135,38 @@ export default function InlineLesson({ data }: { data: any }) {
                 {data.strategy === 'CODE' && (
                     <div className="w-full h-full bg-[#1e1e1e] p-4 overflow-auto font-mono text-xs text-green-400">
                         <pre>{data.data.code}</pre>
+                    </div>
+                )}
+
+                {/* STRATEGY: IMAGE */}
+                {data.strategy === 'IMAGE' && (
+                    <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center p-4">
+                        {isGenerating && (
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                                <p className="text-stone-600 font-bold text-sm">Generating illustration...</p>
+                            </div>
+                        )}
+                        {imageError && (
+                            <div className="text-center">
+                                <p className="text-red-600 font-bold mb-2">Could not generate image</p>
+                                <button 
+                                    onClick={generateImage}
+                                    className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+                                >
+                                    Try Again
+                                </button>
+                            </div>
+                        )}
+                        {imageUrl && !isGenerating && (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <img 
+                                    src={imageUrl} 
+                                    alt={data.title}
+                                    className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
